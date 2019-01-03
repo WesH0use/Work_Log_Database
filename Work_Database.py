@@ -9,17 +9,28 @@ from peewee import *
 
 db = SqliteDatabase('Work_Database.db')
 
-class Entry(Model):
-    content = TextField()
-    timestamp = DateTimeField(default = datetime.datetime.now)
+class User(Model):
+    """Table that stores the user's name"""
+    employee_name = CharField()
 
     class Meta:
         database = db
 
+
+class Entry(Model):
+    employee_name = CharField()
+    task_minutes = IntegerField(default=0)
+    task_name = CharField()
+    task_date = DateTimeField()
+
+    class Meta:
+        database = db
+
+
 def initialize():
     """Create the database and the table if they don't already exist"""
     db.connect()
-    db.create_tables([Entry], safe=True)
+    db.create_tables([User, Entry], safe=True)
 
 
 def clear():
@@ -97,41 +108,63 @@ def find_entry():
                     print("Invalid date")
 
 
-
-
 def new_entry():
-    """Add a new entry"""
-    get_employee()
-    get_task()
-
-
-
+    """Add and create a new entry"""
+    username = get_employee()
+    clear()
+    task_date = get_date("What is the date of the task? Please use the MM/DD/YYYY format: ")
+    clear()
+    task_name = input("Title of the task: ")
+    clear()
+    task_minutes = get_minutes("Time spent, rounded in minutes: ")
+    clear()
+    task_notes = input("Notes (optional, you may leave this blank): ")
+    return username, task_date, task_name, task_minutes, task_notes
 
 
 def get_employee():
     """Employee name input"""
     while True:
-        employee_name = input("Please enter the employee's name: ")
+        username = input("Please enter the employee's name: ")
         clear()
 
-        if employee_name:
+        if username:
             if input("Save entry? [Y/N]").upper != 'N':
-                Entry.create(content=employee_name)
+                Entry.create(username=employee_name)
                 break
 
-def get_task():
-    clear()
+
+def get_date(question):
     while True:
-        task_name = input("Please enter the task name: ")
-        clear()
+        try:
+            date_input = input(question)
+            datetime.datetime.strptime(date_input, "%m/%d/%Y")
+            break
+        except ValueError:
+            print("Invalid date")
 
-        if task_name:
-            if input("Save entry? [Y/N]").upper != 'N':
-                Entry.create(content=task_name)
-                break
 
-def get_minutes():
-    pass
+def get_minutes(minute_input):
+    while True:
+        try:
+            minutes = int(input(minute_input))
+        except ValueError:
+            clear()
+            print("Please provide a valid number")
+            continue
+        else:
+            break
+    return minutes
+
+
+def write_log(date, title, minutes, notes):
+    """Write the work log to the database."""
+    username = get_employee()
+    Entry.create(username=username,
+               task_date=date,
+               task_name=title,
+               task_minutes=minutes,
+               task_notes=notes)
 
 
 def find_employee(name_search):
