@@ -1,9 +1,13 @@
-#!/us/bin/env python3
+#!/usr/bin/env python3
+
+from collections import OrderedDict
 import datetime
+import sys
 
 from peewee import *
 
 db = SqliteDatabase('Work_Database.db')
+
 
 class Entry(Model):
     content = TextField()
@@ -20,7 +24,18 @@ def initialize():
 
 def main_menu():
     """Show the menu"""
-    pass
+
+    choice = None
+
+    while choice != 'q':
+        print("Enter 'q' to quit.")
+        for key, value in menu.items():
+            print('{}) {}'.format(key, value.__doc__))
+        choice = input('Action: ').lower().strip()
+
+        if choice in menu:
+            menu[choice]()
+
     # Option to look up previous entry or add new entry
 
     # new work log option
@@ -45,7 +60,7 @@ def find_date():
     pass
     # presented with a list of dates with entries and be able to choose one to see entries.
 
-def fine_time():
+def find_time():
     """Find entries that match a specific time spent"""
     pass
     # search by time spent and presented with list of projects matching time spent
@@ -53,6 +68,17 @@ def fine_time():
 def find_term():
     """Search entries that match with a specific term/string"""
     pass
+
+
+menu = OrderedDict([
+    ('f', find_entry),
+    ('n', new_entry),
+    ('e', find_employee),
+    ('d', find_date),
+    ('t', find_time),
+    ('p', find_term)
+])
+
 
 if __name__ == '__main__':
     initialize()
