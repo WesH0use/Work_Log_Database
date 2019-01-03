@@ -103,7 +103,6 @@ def new_entry():
     """Add a new entry"""
     get_employee()
     get_task()
-    get_valid_date()
 
 
 
@@ -121,6 +120,7 @@ def get_employee():
                 break
 
 def get_task():
+    clear()
     while True:
         task_name = input("Please enter the task name: ")
         clear()
