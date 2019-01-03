@@ -42,26 +42,30 @@ def main_menu():
         if choice in menu:
             clear()
             menu[choice]()
-        elif choice == 'c':
-            continue
         else:
             clear()
-            print("That is not a valid selection")
+            print("That is not a valid selection.")
         clear()
         print("Thanks for using the Work Log Database.")
 
-    # Option to look up previous entry or add new entry
 
-    # new work log option
+def find_entry():
+    """Search for an existing entry"""
+    choice = None
+    clear()
+
+    while choice != 'q':
+        print("Enter 'q' to quit.")
+        for key, value in sub_menu.items():
+            print('{}) {}'.format(key, value.__doc__))
+        choice = input('\n> ').lower().strip()
+
 
 def new_entry():
     """Add a new entry"""
-    print("Please provide your name.")
-    data = sys.stdin.read().strip()
+    pass
 
-   pass
 
-    # user provide name, task name, number of minutes spent working, additional notes
 
 def get_employee():
     """Employee name input"""
@@ -70,47 +74,50 @@ def get_employee():
         clear()
         return employee_name
 
-def get_date():
+def get_valid_date():
 
     while True:
         date_input = input("Please provide a date using the MM/DD/YYYY format: ")
 
         try:
             datetime.datetime.strptime(date_input, "%m/%d/%Y")
-            return date_input
+            find_date(date_input)
+            break
 
         except ValueError:
             print("Please provide a valid date using the format MM/DD/YYYY")
 
 
-def find_entry():
-    """Search for an existing entry"""
-    pass
-    # presented with four options: find employee, date, time spent, search item
-
 def find_employee():
-    """Find an employee and their respective entry"""
+    """Search using name of employee"""
     pass
     # present list of employees with entries and be able to chose one to see entries
 
 def find_date(date_input):
-    """Find entries associated with a specific date"""
+    """Search by date"""
     pass
     # presented with a list of dates with entries and be able to choose one to see entries.
 
 def find_time():
-    """Find entries that match a specific time spent"""
+    """Search by time spent"""
     pass
     # search by time spent and presented with list of projects matching time spent
 
 def find_term():
-    """Search entries that match with a specific term/string"""
+    """Search by term"""
     pass
 
 
 menu = OrderedDict([
-    ('a', find_entry),
-    ('b', new_entry)
+    ('a', new_entry),
+    ('b', find_entry)
+])
+
+sub_menu = OrderedDict([
+    ('a', find_employee),
+    ('b', find_time),
+    ('c', find_term),
+    ('d', find_date)
 ])
 
 
