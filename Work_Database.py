@@ -110,7 +110,7 @@ def find_entry():
 
 def new_entry():
     """Add and create a new entry"""
-    username = get_employee()
+    username = get_employee("Please enter the employee's name: ")
     clear()
     task_date = get_date("What is the date of the task? Please use the MM/DD/YYYY format: ")
     clear()
@@ -119,19 +119,13 @@ def new_entry():
     task_minutes = get_minutes("Time spent, rounded in minutes: ")
     clear()
     task_notes = input("Notes (optional, you may leave this blank): ")
-    return username, task_date, task_name, task_minutes, task_notes
+    write_entry(username, task_date, task_name, task_minutes, task_notes)
 
 
-def get_employee():
+def get_employee(name_input):
     """Employee name input"""
-    while True:
-        username = input("Please enter the employee's name: ")
-        clear()
-
-        if username:
-            if input("Save entry? [Y/N]").upper != 'N':
-                Entry.create(username=employee_name)
-                break
+    username = input(name_input)
+    return username
 
 
 def get_date(question):
@@ -157,14 +151,13 @@ def get_minutes(minute_input):
     return minutes
 
 
-def write_log(date, title, minutes, notes):
+def write_entry(username, task_date, task_name, task_minutes, task_notes):
     """Write the work log to the database."""
-    username = get_employee()
     Entry.create(username=username,
-               task_date=date,
-               task_name=title,
-               task_minutes=minutes,
-               task_notes=notes)
+                 task_date=task_date,
+                 task_name=task_name,
+                 task_minutes=task_minutes,
+                 task_notes=task_notes)
 
 
 def find_employee(name_search):
