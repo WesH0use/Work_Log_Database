@@ -60,10 +60,52 @@ def find_entry():
             print('{}) {}'.format(key, value.__doc__))
         choice = input('\n> ').lower().strip()
 
+        if choice == 'a':
+            clear()
+            name_search = input("Please enter the name you'd like to search: ")
+            find_employee(name_search)
+
+        if choice == 'b':
+            clear()
+            while True:
+                try:
+                    time_input = int(input("Please enter time spent in minutes (Whole numbers only): "))
+                    break
+                except ValueError:
+                    clear()
+                    print("Invalid entry.")
+
+            find_time(time_input)
+
+        if choice == 'c':
+            clear()
+            string_search = input("Please enter your search: ")
+            find_term(string_search)
+
+        if choice == 'd':
+            clear()
+            while True:
+                date_input = input("Please provide a date. Please use the format MM/DD/YYYY: ")
+                clear()
+
+                try:
+                    datetime.datetime.strptime(date_input, "%m/%d/%Y")
+                    find_date(date_input)
+                    break
+
+                except ValueError:
+                    print("Invalid date")
+
+
+
 
 def new_entry():
     """Add a new entry"""
-    pass
+    get_employee()
+    get_task()
+    get_valid_date()
+
+
 
 
 
@@ -72,23 +114,27 @@ def get_employee():
     while True:
         employee_name = input("Please enter the employee's name: ")
         clear()
-        return employee_name
 
-def get_valid_date():
+        if employee_name:
+            if input("Save entry? [Y/N]").upper != 'N':
+                Entry.create(content=employee_name)
+                break
 
+def get_task():
     while True:
-        date_input = input("Please provide a date using the MM/DD/YYYY format: ")
+        task_name = input("Please enter the task name: ")
+        clear()
 
-        try:
-            datetime.datetime.strptime(date_input, "%m/%d/%Y")
-            find_date(date_input)
-            break
+        if task_name:
+            if input("Save entry? [Y/N]").upper != 'N':
+                Entry.create(content=task_name)
+                break
 
-        except ValueError:
-            print("Please provide a valid date using the format MM/DD/YYYY")
+def get_minutes():
+    pass
 
 
-def find_employee():
+def find_employee(name_search):
     """Search using name of employee"""
     pass
     # present list of employees with entries and be able to chose one to see entries
@@ -96,14 +142,15 @@ def find_employee():
 def find_date(date_input):
     """Search by date"""
     pass
-    # presented with a list of dates with entries and be able to choose one to see entries.
 
-def find_time():
+
+
+def find_time(time_input):
     """Search by time spent"""
     pass
     # search by time spent and presented with list of projects matching time spent
 
-def find_term():
+def find_term(string_search):
     """Search by term"""
     pass
 
@@ -124,31 +171,3 @@ sub_menu = OrderedDict([
 if __name__ == '__main__':
     initialize()
     main_menu()
-
-    # User enters string and presented with entries containing the string in task name OR notes.
-
-    # As a user of the script, I should be able to choose whether to add a new entry or lookup previous entries.
-
-    # As a user of the script, if I choose to enter a new work log, I should be able to provide my name, a task name,
-    # a number of minutes spent working on it, and any additional notes I want to record.
-
-    # As a user of the script, if I choose to find a previous entry, I should be presented with four options:
-    # find by employee, find by date, find by time spent, find by search term.
-
-    # As a user of the script, if finding by employee, I should be presented with a list of employees with entries and
-    # be able to choose one to see entries from.
-
-    # As a user of the script, if finding by employee, I should be allowed to enter employee name and then be
-    # presented with entries with that employee as their creator.
-
-    # As a user of the script, if finding by date, I should be presented with a list of dates with entries and
-    # be able to choose one to see entries from.
-
-    # As a user of the script, if finding by time spent, I should be allowed to enter the amount of time spent
-    # on the project and then be presented with entries containing that amount of time spent.
-
-    # As a user of the script, if finding by a search term, I should be allowed to enter a string and then be presented
-    # with entries containing that string in the task name or notes.
-
-    # As a fellow developer, I should find at least 50% of the code covered by tests. I would use coverage.py
-    # to validate this amount of coverage.
