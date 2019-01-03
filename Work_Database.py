@@ -3,11 +3,11 @@
 from collections import OrderedDict
 import datetime
 import sys
+import os
 
 from peewee import *
 
 db = SqliteDatabase('Work_Database.db')
-
 
 class Entry(Model):
     content = TextField()
@@ -22,19 +22,33 @@ def initialize():
     db.create_tables([Entry], safe=True)
 
 
+def clear():
+    """Clear the screen"""
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
 def main_menu():
     """Show the menu"""
 
     choice = None
 
+    clear()
     while choice != 'q':
         print("Enter 'q' to quit.")
         for key, value in menu.items():
             print('{}) {}'.format(key, value.__doc__))
-        choice = input('Action: ').lower().strip()
+        choice = input('\n> ').lower().strip()
 
         if choice in menu:
+            clear()
             menu[choice]()
+        elif choice == 'c':
+            continue
+        else:
+            clear()
+            print("That is not a valid selection")
+        clear()
+        print("Thanks for using the Work Log Database.")
 
     # Option to look up previous entry or add new entry
 
@@ -42,8 +56,32 @@ def main_menu():
 
 def new_entry():
     """Add a new entry"""
-    pass
+    print("Please provide your name.")
+    data = sys.stdin.read().strip()
+
+   pass
+
     # user provide name, task name, number of minutes spent working, additional notes
+
+def get_employee():
+    """Employee name input"""
+    while True:
+        employee_name = input("Please enter the employee's name: ")
+        clear()
+        return employee_name
+
+def get_date():
+
+    while True:
+        date_input = input("Please provide a date using the MM/DD/YYYY format: ")
+
+        try:
+            datetime.datetime.strptime(date_input, "%m/%d/%Y")
+            return date_input
+
+        except ValueError:
+            print("Please provide a valid date using the format MM/DD/YYYY")
+
 
 def find_entry():
     """Search for an existing entry"""
@@ -55,7 +93,7 @@ def find_employee():
     pass
     # present list of employees with entries and be able to chose one to see entries
 
-def find_date():
+def find_date(date_input):
     """Find entries associated with a specific date"""
     pass
     # presented with a list of dates with entries and be able to choose one to see entries.
@@ -71,12 +109,8 @@ def find_term():
 
 
 menu = OrderedDict([
-    ('f', find_entry),
-    ('n', new_entry),
-    ('e', find_employee),
-    ('d', find_date),
-    ('t', find_time),
-    ('p', find_term)
+    ('a', find_entry),
+    ('b', new_entry)
 ])
 
 
