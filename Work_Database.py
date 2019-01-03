@@ -1,45 +1,64 @@
+#!/us/bin/env python3
+import datetime
+
 from peewee import *
 
 db = SqliteDatabase('Work_Database.db')
 
 class Entry(Model):
+    content = TextField()
+    timestamp = DateTimeField(default = datetime.datetime.now)
+
+    class Meta:
+        database = db
+
+def initialize():
+    """Create the database and the table if they don't already exist"""
+    db.connect()
+    db.create_tables([Entry], safe=True)
+
+
+def main_menu():
+    """Show the menu"""
+    pass
+    # Option to look up previous entry or add new entry
+
+    # new work log option
+
+def new_entry():
+    """Add a new entry"""
+    pass
+    # user provide name, task name, number of minutes spent working, additional notes
+
+def find_entry():
+    """Search for an existing entry"""
+    pass
+    # presented with four options: find employee, date, time spent, search item
+
+def find_employee():
+    """Find an employee and their respective entry"""
+    pass
+    # present list of employees with entries and be able to chose one to see entries
+
+def find_date():
+    """Find entries associated with a specific date"""
+    pass
+    # presented with a list of dates with entries and be able to choose one to see entries.
+
+def fine_time():
+    """Find entries that match a specific time spent"""
+    pass
+    # search by time spent and presented with list of projects matching time spent
+
+def find_term():
+    """Search entries that match with a specific term/string"""
     pass
 
-    def main_menu():
-        pass
-        # Option to look up previous entry or add new entry
+if __name__ == '__main__':
+    initialize()
+    main_menu()
 
-        # new work log option
-
-
-    def new_entry():
-        pass
-        # user provide name, task name, number of minutes spent working, additional notes
-
-
-    def find_entry():
-        pass
-        # presented with four options: find employee, date, time spent, search item
-
-
-    def find_employee():
-        pass
-        # present list of employees with entries and be able to chose one to see entries
-
-
-    def find_date():
-        pass
-        # presented with a list of dates with entries and be able to choose one to see entries.
-
-
-    def fine_time():
-        pass
-        # search by time spent and presented with list of projects matching time spent
-
-
-    def find_term():
-        pass
-        # User enters string and presented with entries containing the string in task name OR notes.
+    # User enters string and presented with entries containing the string in task name OR notes.
 
     # As a user of the script, I should be able to choose whether to add a new entry or lookup previous entries.
 
