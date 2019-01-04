@@ -2,7 +2,6 @@
 
 from collections import OrderedDict
 import datetime
-import sys
 import os
 
 from peewee import *
@@ -19,6 +18,7 @@ class Entry(Model):
 
     class Meta:
         database = db
+
 
 
 def initialize():
@@ -85,7 +85,7 @@ def find_entry():
         if choice == 'c':
             clear()
             string_search = input("Please enter your search: ")
-            find_term(string_search)
+            find_note(string_search)
 
         if choice == 'd':
             clear()
@@ -167,8 +167,7 @@ def add_new_entry():
 
 def find_employee(name_search):
     """Search using name of employee"""
-    pass
-    # present list of employees with entries and be able to chose one to see entries
+    return Entry.select().where(Entry.username == name_search)
 
 def find_date(date_input):
     """Search by date"""
@@ -176,17 +175,16 @@ def find_date(date_input):
 
 def find_time(time_input):
     """Search by time spent"""
-    pass
-    # search by time spent and presented with list of projects matching time spent
+    return Entry.select().where(Entry.task_minutes == time_input)
 
-def find_term():
+def find_note(string_search):
+    """Search by task name or notes"""
+    pass
+
+
+def find_task(string_search):
     """Search by term"""
-    clear()
-    search_term = '%' + input("Enter the term that you would like to use " +
-                              "to search the logs.\n> ") + '%'
-    search_logs = Entry.select().where(Entry.task_name ** search_term |
-                                       Entry.task_notes ** search_term)
-    return search_logs
+    return Entry.select().where(Entry.notes == string_search)
 
 
 menu = OrderedDict([
@@ -197,7 +195,7 @@ menu = OrderedDict([
 sub_menu = OrderedDict([
     ('a', find_employee),
     ('b', find_time),
-    ('c', find_term),
+    ('c', find_note),
     ('d', find_date)
 ])
 
