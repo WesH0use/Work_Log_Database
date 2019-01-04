@@ -18,10 +18,11 @@ class User(Model):
 
 
 class Entry(Model):
-    employee_name = CharField()
-    task_minutes = IntegerField(default=0)
-    task_name = CharField()
-    task_date = DateTimeField()
+    employee_name = CharField(max_length=255)
+    task_minutes = IntegerField()
+    task_name = CharField(max_length=535)
+    task_date = DateTimeField(default=datetime.date.today().strftime('%d/%m/%Y'))
+    notes = TextField(default="")
 
     class Meta:
         database = db
@@ -119,7 +120,7 @@ def new_entry():
     task_minutes = get_minutes("Time spent, rounded in minutes: ")
     clear()
     task_notes = input("Notes (optional, you may leave this blank): ")
-    write_entry(username, task_date, task_name, task_minutes, task_notes)
+    return username, task_date, task_name, task_minutes, task_notes
 
 
 def get_employee(name_input):
@@ -167,9 +168,7 @@ def find_employee(name_search):
 
 def find_date(date_input):
     """Search by date"""
-    pass
-
-
+    return Entry.select().where(Entry.task_date == date_input)
 
 def find_time(time_input):
     """Search by time spent"""
@@ -197,3 +196,4 @@ sub_menu = OrderedDict([
 if __name__ == '__main__':
     initialize()
     main_menu()
+    write_entry()
