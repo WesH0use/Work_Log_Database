@@ -179,9 +179,14 @@ def find_time(time_input):
     pass
     # search by time spent and presented with list of projects matching time spent
 
-def find_term(string_search):
+def find_term():
     """Search by term"""
-    pass
+    clear()
+    search_term = '%' + input("Enter the term that you would like to use " +
+                              "to search the logs.\n> ") + '%'
+    search_logs = Entry.select().where(Entry.task_name ** search_term |
+                                       Entry.task_notes ** search_term)
+    return search_logs
 
 
 menu = OrderedDict([
