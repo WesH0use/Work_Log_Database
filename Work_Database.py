@@ -9,17 +9,10 @@ from peewee import *
 
 db = SqliteDatabase('Work_Database.db')
 
-class User(Model):
-    """Table that stores the user's name"""
-    employee_name = CharField()
-
-    class Meta:
-        database = db
-
 
 class Entry(Model):
     employee_name = CharField(max_length=255)
-    task_minutes = IntegerField()
+    task_minutes = IntegerField(default=0)
     task_name = CharField(max_length=535)
     task_date = DateTimeField(default=datetime.date.today().strftime('%d/%m/%Y'))
     notes = TextField(default="")
@@ -31,7 +24,7 @@ class Entry(Model):
 def initialize():
     """Create the database and the table if they don't already exist"""
     db.connect()
-    db.create_tables([User, Entry], safe=True)
+    db.create_tables([Entry], safe=True)
 
 
 def clear():
@@ -109,7 +102,7 @@ def find_entry():
                     print("Invalid date")
 
 
-def new_entry():
+def input_info():
     """Add and create a new entry"""
     username = get_employee("Please enter the employee's name: ")
     clear()
@@ -160,6 +153,17 @@ def write_entry(username, task_date, task_name, task_minutes, task_notes):
                  task_minutes=task_minutes,
                  task_notes=task_notes)
 
+def add_new_entry():
+    """Add new entry"""
+    log = input_info()
+    write_entry(log[0], log[1], log[2], log[3], log[4])
+    clear()
+    __ = input("The entry has been added. Press 'Enter'" +
+               "to return to the main menu.")
+    clear()
+    return True
+
+
 
 def find_employee(name_search):
     """Search using name of employee"""
@@ -181,7 +185,7 @@ def find_term(string_search):
 
 
 menu = OrderedDict([
-    ('a', new_entry),
+    ('a', add_new_entry),
     ('b', find_entry)
 ])
 
@@ -196,4 +200,3 @@ sub_menu = OrderedDict([
 if __name__ == '__main__':
     initialize()
     main_menu()
-    write_entry()
