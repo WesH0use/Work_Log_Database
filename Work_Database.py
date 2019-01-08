@@ -34,9 +34,7 @@ def clear():
 
 def main_menu():
     """Show the menu"""
-
     choice = None
-
     clear()
     while choice != 'q':
         print("Enter 'q' to quit.")
@@ -47,11 +45,11 @@ def main_menu():
         if choice in menu:
             clear()
             menu[choice]()
-        else:
+        if choice not in menu:
             clear()
             print("That is not a valid selection.")
         clear()
-        print("Thanks for using the Work Log Database.")
+        print("Invalid Entry. Please select from one of the following options:\n")
 
 
 def find_entry():
@@ -100,6 +98,11 @@ def find_entry():
 
                 except ValueError:
                     print("Invalid date")
+
+        if choice not in sub_menu:
+            clear()
+            print("Invalid Entry. Please select from one of the following options:\n")
+
 
 
 def input_info():
