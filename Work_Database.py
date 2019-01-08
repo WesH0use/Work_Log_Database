@@ -104,7 +104,7 @@ def find_entry():
 
 def input_info():
     """Add and create a new entry"""
-    username = get_employee("Please enter the employee's name: ")
+    employee_name = get_employee("Please enter the employee's name: ")
     clear()
     task_date = get_date("What is the date of the task? Please use the MM/DD/YYYY format: ")
     clear()
@@ -113,13 +113,13 @@ def input_info():
     task_minutes = get_minutes("Time spent, rounded in minutes: ")
     clear()
     task_notes = input("Notes (optional, you may leave this blank): ")
-    return username, task_date, task_name, task_minutes, task_notes
+    return employee_name, task_date, task_name, task_minutes, task_notes
 
 
 def get_employee(name_input):
     """Employee name input"""
-    username = input(name_input)
-    return username
+    employee_name = input(name_input)
+    return employee_name
 
 
 def get_date(question):
@@ -130,6 +130,8 @@ def get_date(question):
             break
         except ValueError:
             print("Invalid date")
+            continue
+    return date_input
 
 
 def get_minutes(minute_input):
@@ -145,13 +147,14 @@ def get_minutes(minute_input):
     return minutes
 
 
-def write_entry(username, task_date, task_name, task_minutes, task_notes):
+def write_entry(employee_name, task_date, task_name, task_minutes, task_notes):
     """Write the work log to the database."""
-    Entry.create(username=username,
+    Entry.create(employee_name=employee_name,
                  task_date=task_date,
                  task_name=task_name,
                  task_minutes=task_minutes,
                  task_notes=task_notes)
+
 
 def add_new_entry():
     """Add new entry"""
@@ -164,18 +167,20 @@ def add_new_entry():
     return True
 
 
-
 def find_employee(name_search):
     """Search using name of employee"""
-    return Entry.select().where(Entry.username == name_search)
+    return Entry.select().where(Entry.employee_name == name_search)
+
 
 def find_date(date_input):
     """Search by date"""
     return Entry.select().where(Entry.task_date == date_input)
 
+
 def find_time(time_input):
     """Search by time spent"""
     return Entry.select().where(Entry.task_minutes == time_input)
+
 
 def find_note(string_search):
     """Search by task name or notes"""
