@@ -49,7 +49,7 @@ def main_menu():
             clear()
             print("That is not a valid selection.")
         clear()
-        print("Invalid Entry. Please select from one of the following options:\n")
+        print("Please select from one of the following options:\n")
 
 
 def find_entry():
@@ -82,7 +82,7 @@ def find_entry():
 
         if choice == 'c':
             clear()
-            string_search = input("Please enter your search: ")
+            string_search = input("Please enter the note you'd like to search: ")
             find_note(string_search)
 
         if choice == 'd':
@@ -101,7 +101,7 @@ def find_entry():
 
         if choice not in sub_menu:
             clear()
-            print("Invalid Entry. Please select from one of the following options:\n")
+            print("Please select from one of the following options:\n")
 
 
 
@@ -156,7 +156,7 @@ def write_entry(employee_name, task_date, task_name, task_minutes, task_notes):
                  task_date=task_date,
                  task_name=task_name,
                  task_minutes=task_minutes,
-                 task_notes=task_notes)
+                 notes=task_notes)
 
 
 def add_new_entry():
@@ -172,22 +172,34 @@ def add_new_entry():
 
 def find_employee(name_search):
     """Search using name of employee"""
-    return Entry.select().where(Entry.employee_name == name_search)
+    if Entry.select().where(Entry.employee_name.contains(name_search)):
+        print(Entry.employee_name)
+        print('=' * len(name_search))
+    else:
+        print("Sorry, that name is not in the database.")
 
 
 def find_date(date_input):
     """Search by date"""
-    return Entry.select().where(Entry.task_date == date_input)
+    pass
 
 
 def find_time(time_input):
     """Search by time spent"""
-    return Entry.select().where(Entry.task_minutes == time_input)
+    if Entry.select().where(Entry.task_minutes == time_input):
+        print(Entry.task_minutes)
+        print('=' * 5)
+    else:
+        print("Sorry, that time length is not in the database.")
 
 
 def find_note(string_search):
-    """Search by task name or notes"""
-    pass
+    """Search through the notes"""
+    if Entry.select().where(Entry.notes.contains(string_search)):
+        print(Entry.notes)
+        print('=' * len(string_search))
+    else:
+        print("Sorry, that name is not in the database.")
 
 
 def find_task(string_search):
