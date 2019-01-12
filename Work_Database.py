@@ -20,7 +20,6 @@ class Entry(Model):
         database = db
 
 
-
 def initialize():
     """Create the database and the table if they don't already exist"""
     db.connect()
@@ -39,40 +38,41 @@ def main_menu():
     clear()
     while choice != 'q':
         print("Welcome to the Worklog database. Enter 'q' to quit.")
-        for key, value in menu.items():
+        for key, value in directory_main.items():
             print('{}) {}'.format(key, value.__doc__))
         choice = input('\n> ').lower().strip()
 
-        if choice in menu:
+        if choice in directory_main:
             clear()
-            menu[choice]()
+            directory_main[choice]()
 
-        if choice not in menu:
+        if choice not in directory_main:
             clear()
             print("That is not a valid selection.")
         clear()
         print("Please select from one of the following options:\n")
 
 
-def find_entry():
+def view_loop():
     """Search for an existing entry"""
     choice = None
     clear()
 
     while choice != 'q':
         print("Enter 'q' to quit.")
-        for key, value in sub_menu.items():
+        for key, value in directory_view.items():
             print('{}) {}'.format(key, value.__doc__))
         choice = input('\n> ').lower().strip()
 
-        if choice in sub_menu:
+        if choice in directory_view:
             clear()
-            entries = sub_menu[choice]()
+            entries = directory_view[choice]()
             view_entry(entries)
 
-        if choice not in sub_menu:
+        if choice not in directory_view:
             clear()
             print("Please select from one of the following options:\n")
+
 
 def view_entry(entries):
     """Return the entries"""
@@ -87,7 +87,7 @@ def view_entry(entries):
         Notes: {}
         """.format(entry.employee_name,
                 entry.task_date,
-                entry.task_name
+                entry.task_name,
                 entry.task_minutes,
                 entry.notes
                 ))
@@ -105,6 +105,7 @@ def view_entry(entries):
 
             elif next_action != 'n':
                 next_action = None
+
 
 def add_entry():
     """Add a new entry"""
@@ -151,6 +152,7 @@ def get_task_name():
         else:
             return task_name
 
+
 def get_time_spent():
     """Get the amount of time spent on a specific task"""
     while True:
@@ -163,130 +165,111 @@ def get_time_spent():
         else:
             return duration
 
+
 def get_notes():
     """Get the optional notes from the task"""
     notes = input("Please enter any additional notes for this entry (OPTIONAL): ")
     return notes
 
 
+def find_by_employee():
+    """Find employee based on entry"""
+    entries = Entry.select().order_by(Entry.employee_name.desc())
+    print("Find by employee:\nSelect an employee from the list below:")
+    employees = []
+
+    for entry in entries:
+        if entry.employee_name not in employees:
+            employees.append(entry.employee_name)
+
+    for entry in employees:
+        print("{}) {}".format(employees.index(entry), str(entry)))
+
+    selection = test_input(len(employees))
+    return entries.where(Entry.employee_name.contains(employees[selection]))
 
 
+def find_by_date():
+    """Find by date of the task"""
+    entries = Entry.select().order_by(Entry.task_date.desc())
+    print("Find by date:\nSelect a date from the list below:")
+    date = []
 
-######
+    for entry in entries:
+        if entry.task_date not in date:
+            date.append(entry.task_date)
 
+    for entry in date:
+        print("{}) {}".format(date.index(entry),
+                              entry.strftime('%A %B %d, %Y %I:%Mp')))
 
-
-
-def input_info():
-    """Add and create a new entry"""
-    employee_name = get_employee("Please enter the employee's name: ")
-    clear()
-    task_date = get_date("What is the date of the task? Please use the MM/DD/YYYY format: ")
-    clear()
-    task_name = input("Title of the task: ")
-    clear()
-    task_minutes = get_minutes("Time spent, rounded in minutes: ")
-    clear()
-    task_notes = input("Notes (optional, you may leave this blank): ")
-    return employee_name, task_date, task_name, task_minutes, task_notes
+    selection = test_input(len(date))
+    return entries.where(Entry.task_date.contains(date[selection]))
 
 
-def get_employee(name_input):
-    """Employee name input"""
-    employee_name = input(name_input)
-    return employee_name
+def find_by_time_spent():
+    """Find by time spent"""
+    entries = Entry.select().order_by(Entry.task_date.desc())
+    print("Find by date:\nSelect a date from the list below:")
+    duration = []
+
+    for entry in entries:
+        if entry.task_minutes not in duration:
+            duration.append(entry.task_minutes)
+
+    for entry in duration:
+        print("{}) {}".format(duration.index(entry), entry))
+
+    selection = test_input(len(duration))
+    return entries.where(Entry.duration.contains(duration[selection]))
 
 
-def get_date(question):
-    while True:
+def find_by_search_term():
+    """Find by searching for a term"""
+    search_query = input("Enter a term to search the work log:\n> ")
+    entries = Entry.select().order_by(Entry.task_date.desc())
+    logs = entries.where(Entry.employee_name.contains(search_query)|
+                         Entry.task_name.contains(search_query)|
+                         Entry.notes.contains(search_query))
+
+    return logs
+
+
+def delete_entry(entry):
+    """Delete entry"""
+    if input("Are you sure you want to delete this entry? Hit 'Y' for YES 'N' for NO ").upper() == 'Y':
+        entry.delete_instance()
+        print('Entry has been deleted!')
+        input('Press ENTER to continue.')
+
+
+def test_input(length):
+    selection = None
+    while selection is None:
         try:
-            date_input = input(question)
-            datetime.datetime.strptime(date_input, "%m/%d/%Y")
-            break
+            selection = int(input("> "))
         except ValueError:
-            print("Invalid date")
-            continue
-    return date_input
+            print("Invalid selection. Please select a number.")
+            selection = None
+
+        if selection not in range(0, length):
+            selection = None
+
+    return selection
 
 
-def get_minutes(minute_input):
-    while True:
-        try:
-            minutes = int(input(minute_input))
-        except ValueError:
-            clear()
-            print("Please provide a valid number")
-            continue
-        else:
-            break
-    return minutes
+directory_main = OrderedDict([
+    ('1', add_entry),
+    ('2', view_loop),
+    ])
 
 
-def write_entry(employee_name, task_date, task_name, task_minutes, task_notes):
-    """Write the work log to the database."""
-    Entry.create(employee_name=employee_name,
-                 task_date=task_date,
-                 task_name=task_name,
-                 task_minutes=task_minutes,
-                 notes=task_notes)
-
-
-def add_new_entry():
-    """Add new entry"""
-    log = input_info()
-    write_entry(log[0], log[1], log[2], log[3], log[4])
-    clear()
-    __ = input("The entry has been added. Press 'Enter'" +
-               "to return to the main menu.")
-    clear()
-    return True
-
-
-def find_employee(name_search):
-    """Search using name of employee"""
-    query = list(Entry.select().where(Entry.employee_name.contains(name_search))
-    return query
-
-
-def find_date(date_input):
-    """Search by date"""
-    pass
-
-
-def find_time(time_input):
-    """Search by time spent"""
-    if Entry.select().where(Entry.task_minutes == time_input):
-        print(Entry.task_minutes)
-        print('=' * 5)
-    else:
-        print("Sorry, that time length is not in the database.")
-
-
-def find_note(string_search):
-    """Search through the notes"""
-    if Entry.select().where(Entry.notes.contains(string_search)):
-        print(Entry.notes)
-        print('=' * len(string_search))
-    else:
-        print("Sorry, that note is not in the database.")
-
-
-def find_task(string_search):
-    """Search by term"""
-    return Entry.select().where(Entry.notes == string_search)
-
-
-menu = OrderedDict([
-    ('a', add_new_entry),
-    ('b', find_entry)
-])
-
-sub_menu = OrderedDict([
-    ('a', find_employee),
-    ('b', find_time),
-    ('c', find_note),
-    ('d', find_date)
-])
+directory_view = OrderedDict([
+    ('1', find_by_employee),
+    ('2', find_by_date),
+    ('3', find_by_time_spent),
+    ('4', find_by_search_term)
+    ])
 
 
 if __name__ == '__main__':
