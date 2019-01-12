@@ -10,11 +10,11 @@ db = SqliteDatabase('Work_Database.db')
 
 
 class Entry(Model):
-    employee_name = CharField(max_length=255)
-    task_minutes = IntegerField(default=0)
-    task_name = CharField(max_length=535)
-    task_date = DateTimeField(default=datetime.date.today().strftime('%d/%m/%Y'))
-    notes = TextField(default="")
+    employee_name = CharField(max_length=255, unique=False)
+    task_minutes = CharField(max_length=255, unique=False)
+    task_name = CCharField(max_length=255, unique=False)
+    task_date = DateTimeField(default=datetime.datetime.now)
+    notes = CharField(max_length=255, unique=False)
 
     class Meta:
         database = db
@@ -35,9 +35,10 @@ def clear():
 def main_menu():
     """Show the menu"""
     choice = None
+
     clear()
     while choice != 'q':
-        print("Enter 'q' to quit.")
+        print("Welcome to the Worklog database. Enter 'q' to quit.")
         for key, value in menu.items():
             print('{}) {}'.format(key, value.__doc__))
         choice = input('\n> ').lower().strip()
@@ -45,6 +46,7 @@ def main_menu():
         if choice in menu:
             clear()
             menu[choice]()
+
         if choice not in menu:
             clear()
             print("That is not a valid selection.")
@@ -63,45 +65,115 @@ def find_entry():
             print('{}) {}'.format(key, value.__doc__))
         choice = input('\n> ').lower().strip()
 
-        if choice == 'a':
+        if choice in sub_menu:
             clear()
-            name_search = input("Please enter the name you'd like to search: ")
-            find_employee(name_search)
-
-        if choice == 'b':
-            clear()
-            while True:
-                try:
-                    time_input = int(input("Please enter time spent in minutes (Whole numbers only): "))
-                    break
-                except ValueError:
-                    clear()
-                    print("Invalid entry.")
-
-            find_time(time_input)
-
-        if choice == 'c':
-            clear()
-            string_search = input("Please enter the note you'd like to search: ")
-            find_note(string_search)
-
-        if choice == 'd':
-            clear()
-            while True:
-                date_input = input("Please provide a date. Please use the format MM/DD/YYYY: ")
-                clear()
-
-                try:
-                    datetime.datetime.strptime(date_input, "%m/%d/%Y")
-                    find_date(date_input)
-                    break
-
-                except ValueError:
-                    print("Invalid date")
+            entries = sub_menu[choice]()
+            view_entry(entries)
 
         if choice not in sub_menu:
             clear()
             print("Please select from one of the following options:\n")
+
+def view_entry(entries):
+    """Return the entries"""
+    for entry in entries:
+        clear()
+        print("Below are your selected entries: ")
+        print("""
+        Name: {}
+        Date: {}
+        Task: {}
+        Length: {}
+        Notes: {}
+        """.format(entry.employee_name,
+                entry.task_date,
+                entry.task_name
+                entry.task_minutes,
+                entry.notes
+                ))
+
+        print('n) next entry')
+        print('d) delete entry')
+
+        next_action = None
+
+        while next_action is None:
+            next_action = input(">: ").lower().strip()
+
+            if next_action == 'd':
+                delete_entry(entry)
+
+            elif next_action != 'n':
+                next_action = None
+
+def add_entry():
+    """Add a new entry"""
+    print("Add a new entry: ")
+    info1 = get_employee_name()
+    clear()
+
+    print("Add a new entry: ")
+    info2 = get_task_name()
+    clear()
+
+    print("Add a new entry: ")
+    info3 = get_time_spent()
+    clear()
+
+    print("Add a new entry: ")
+    info4 = get_notes()
+    clear()
+
+    Entry.create(employee_name=info1, task_name=info2, task_minutes=info3, notes=info4)
+
+    print("Saved successfully!")
+    input("Press ENTER to continue.")
+
+
+def get_employee_name():
+    """Get the name of the employee"""
+    while True:
+        employee = input("Enter the employee's name: ")
+        if len(employee) == 0:
+            print("\n You must enter a name")
+            continue
+        else:
+            return employee
+
+
+def get_task_name():
+    """Get the name of the task"""
+    while True:
+        task_name=input("Enter the name of the task: ")
+        if len(task_name) == 0:
+            print("\nPlease enter a valid task name\n")
+            continue
+        else:
+            return task_name
+
+def get_time_spent():
+    """Get the amount of time spent on a specific task"""
+    while True:
+        duration = input("Enter the time for the task (in minutes): ")
+        try:
+            int(duration)
+        except ValueError:
+            print("\nInvalid number. Please enter whole integers only\n")
+            continue
+        else:
+            return duration
+
+def get_notes():
+    """Get the optional notes from the task"""
+    notes = input("Please enter any additional notes for this entry (OPTIONAL): ")
+    return notes
+
+
+
+
+
+######
+
 
 
 
@@ -172,11 +244,8 @@ def add_new_entry():
 
 def find_employee(name_search):
     """Search using name of employee"""
-    if Entry.select().where(Entry.employee_name.contains(name_search)):
-        print(Entry.employee_name)
-        print('=' * len(name_search))
-    else:
-        print("Sorry, that name is not in the database.")
+    query = list(Entry.select().where(Entry.employee_name.contains(name_search))
+    return query
 
 
 def find_date(date_input):
@@ -199,7 +268,7 @@ def find_note(string_search):
         print(Entry.notes)
         print('=' * len(string_search))
     else:
-        print("Sorry, that name is not in the database.")
+        print("Sorry, that note is not in the database.")
 
 
 def find_task(string_search):
